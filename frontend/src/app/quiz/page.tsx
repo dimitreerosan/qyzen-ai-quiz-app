@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/Button";
@@ -233,7 +235,11 @@ export default function MyQuizzesPage() {
     return cards.filter((c) => c.category === activeCategory);
   }, [activeCategory, cards]);
 
-  const last = getSessionJSON<{ quizId: number; score: number }>(StorageKeys.lastResults);
+  const [last, setLast] = React.useState<{ quizId: number; score: number } | null>(null);
+
+  React.useEffect(() => {
+    setLast(getSessionJSON<{ quizId: number; score: number }>(StorageKeys.lastResults));
+  }, []);
 
   async function startQuiz(card: BrowseCard) {
     setError(null);
