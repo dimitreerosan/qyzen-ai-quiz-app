@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://127.0.0.1:8000/api";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api";
 
 export type ApiError = {
   status: number;
@@ -28,7 +28,7 @@ async function rawRequest<T>(path: string, options: RequestInit & { token?: stri
   } catch (e) {
     const err: ApiError = {
       status: 0,
-      message: `Cannot reach API at ${API_BASE_URL}. Make sure Django is running on 127.0.0.1:8000 (and not crashing on startup).`,
+      message: `Cannot reach API at ${API_BASE_URL}. Make sure the backend is running and accessible.`,
       details: e
     };
     throw err;
