@@ -1,5 +1,5 @@
-# Render Blueprint — apply or mirror these in the Render dashboard (Build + Start).
-# https://render.com/docs/blueprint-spec
+# Render Blueprint — deploys run migrations + collectstatic (required for DB tables + Whitenoise).
+# Existing service: Dashboard → Settings → set Root Directory = backend, Build Command = buildCommand below.
 services:
   - type: web
     name: qyzen-ai-quiz-app
