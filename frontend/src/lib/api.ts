@@ -29,7 +29,11 @@ function isTokenInvalid(details: unknown): boolean {
 /** Django returns HTML error pages when DEBUG=false; avoid showing raw markup in the UI. */
 function looksLikeHtmlServerPage(text: string): boolean {
   const t = text.trim().toLowerCase();
-  return t.startsWith("<!doctype") || t.startsWith("<html") || (t.includes("<title>") && t.includes("server error"));
+  return (
+    t.includes("<!doctype") ||
+    t.includes("<html") ||
+    (t.includes("<title>") && t.includes("server error"))
+  );
 }
 
 function messageFromFailedResponse(status: number, payload: unknown): string {
@@ -84,8 +88,9 @@ async function rawRequest<T>(path: string, options: RequestInit & { token?: stri
   }
 
   const contentType = res.headers.get("content-type") || "";
-  const isJson = contentType.includes("application/json");
-  const payload = isJson ? await res.json().catch(() => null) : await res.text().catch(() => null);
+  const looksHtml = contentType.includes("text/html");
+  const isJson = contentType.includes("application/json") && !looksHtml;
+  const payload: unknown = isJson ? await res.json().catch(() => null) : await res.text().catch(() => null);
 
   if (!res.ok) {
     const message = messageFromFailedResponse(res.status, payload);
