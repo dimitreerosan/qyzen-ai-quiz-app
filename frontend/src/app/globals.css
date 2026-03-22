@@ -1,0 +1,79 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #f5f6f8;
+  --surface: #ffffff;
+  --border: rgba(2, 6, 23, 0.08);
+  --font-outfit: "Outfit", ui-sans-serif, system-ui;
+}
+
+html,
+body {
+  height: 100%;
+  font-family: var(--font-outfit);
+}
+
+body {
+  background: var(--bg);
+  color: #0b1220;
+}
+
+/* Better default focus ring */
+:focus-visible {
+  outline: none;
+}
+
+/* Subtle scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(2, 6, 23, 0.25) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: rgba(2, 6, 23, 0.22);
+  border-radius: 999px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+@layer components {
+  .app-shell {
+    @apply min-h-screen;
+  }
+
+  .app-container {
+    @apply mx-auto w-full max-w-screen-2xl px-6 lg:px-8;
+  }
+
+  .card {
+    @apply rounded-2xl border border-black/10 bg-white shadow-soft;
+  }
+
+  .card-header {
+    @apply flex items-start justify-between gap-4 border-b border-black/5 px-6 py-5;
+  }
+
+  .card-body {
+    @apply px-6 py-5;
+  }
+
+  .muted {
+    @apply text-black/60;
+  }
+
+  .badge {
+    @apply inline-flex items-center gap-1 rounded-full border border-black/10 bg-white/70 px-2.5 py-1 text-xs font-medium text-ink-900;
+  }
+}
+
