@@ -1,0 +1,9 @@
+# Render Blueprint — apply or mirror these in the Render dashboard (Build + Start).
+# https://render.com/docs/blueprint-spec
+services:
+  - type: web
+    name: qyzen-ai-quiz-app
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt && python manage.py migrate --no-input && python manage.py collectstatic --no-input
+    startCommand: gunicorn qyzen.wsgi:application

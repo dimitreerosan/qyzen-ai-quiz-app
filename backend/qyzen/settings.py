@@ -9,14 +9,20 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 load_dotenv(BASE_DIR / ".env")
 
-SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "change-me")
+# Render often sets SECRET_KEY; local .env may use DJANGO_SECRET_KEY.
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY") or os.getenv("SECRET_KEY") or "change-me"
 DEBUG = False
 
 ALLOWED_HOSTS = [
     "qyzen-ai-quiz-app.onrender.com",
     "localhost",
-    "127.0.0.1"
+    "127.0.0.1",
 ]
+_extra_hosts = os.getenv("ALLOWED_HOSTS") or os.getenv("DJANGO_ALLOWED_HOSTS")
+if _extra_hosts:
+    ALLOWED_HOSTS = list(
+        dict.fromkeys(ALLOWED_HOSTS + [h.strip() for h in _extra_hosts.split(",") if h.strip()])
+    )
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
