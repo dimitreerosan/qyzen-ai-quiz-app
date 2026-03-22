@@ -67,8 +67,13 @@ ASGI_APPLICATION = "qyzen.asgi.application"
 
 _database_url = os.getenv("DATABASE_URL")
 if _database_url:
+    # Render (and most hosted Postgres) require SSL; missing ssl often surfaces as 500 on DB access (e.g. login).
     DATABASES = {
-        "default": dj_database_url.config(default=_database_url)
+        "default": dj_database_url.config(
+            default=_database_url,
+            conn_max_age=600,
+            ssl_require=os.getenv("DATABASE_SSL_REQUIRE", "true").lower() == "true",
+        )
     }
 else:
     DATABASES = {

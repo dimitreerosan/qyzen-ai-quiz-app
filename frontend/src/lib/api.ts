@@ -13,6 +13,38 @@ function isTokenInvalid(details: unknown): boolean {
   return d.code === "token_not_valid" || (typeof d.detail === "string" && d.detail.toLowerCase().includes("token not valid"));
 }
 
+/** Django returns HTML error pages when DEBUG=false; avoid showing raw markup in the UI. */
+function looksLikeHtmlServerPage(text: string): boolean {
+  const t = text.trim().toLowerCase();
+  return t.startsWith("<!doctype") || t.startsWith("<html") || (t.includes("<title>") && t.includes("server error"));
+}
+
+function messageFromFailedResponse(status: number, payload: unknown): string {
+  if (payload && typeof payload === "object") {
+    if ("detail" in payload && String((payload as any).detail)) {
+      return String((payload as any).detail);
+    }
+    const firstKey = Object.keys(payload)[0];
+    const firstVal = (payload as any)[firstKey];
+    if (Array.isArray(firstVal) && firstVal.length > 0) {
+      return `${firstKey}: ${firstVal[0]}`;
+    }
+    if (typeof firstVal === "string") {
+      return `${firstKey}: ${firstVal}`;
+    }
+  }
+  if (typeof payload === "string" && payload) {
+    if (looksLikeHtmlServerPage(payload)) {
+      if (status >= 500) {
+        return "The server had a problem. Try again in a moment. If it keeps happening, check the API logs (e.g. Render dashboard).";
+      }
+      return `Request failed (${status}).`;
+    }
+    return payload;
+  }
+  return `Request failed (${status})`;
+}
+
 async function rawRequest<T>(path: string, options: RequestInit & { token?: string | null } = {}): Promise<T> {
   const { token, headers, ...rest } = options;
   let res: Response;
@@ -39,24 +71,7 @@ async function rawRequest<T>(path: string, options: RequestInit & { token?: stri
   const payload = isJson ? await res.json().catch(() => null) : await res.text().catch(() => null);
 
   if (!res.ok) {
-    let message = `Request failed (${res.status})`;
-
-    if (payload && typeof payload === "object") {
-      if ("detail" in payload && String((payload as any).detail)) {
-        message = String((payload as any).detail);
-      } else {
-        const firstKey = Object.keys(payload)[0];
-        const firstVal = (payload as any)[firstKey];
-        if (Array.isArray(firstVal) && firstVal.length > 0) {
-          message = `${firstKey}: ${firstVal[0]}`;
-        } else if (typeof firstVal === "string") {
-          message = `${firstKey}: ${firstVal}`;
-        }
-      }
-    } else if (typeof payload === "string" && payload) {
-      message = payload;
-    }
-
+    const message = messageFromFailedResponse(res.status, payload);
     const err: ApiError = { status: res.status, message, details: payload };
     throw err;
   }
