@@ -17,10 +17,19 @@ const HOP_BY_HOP = new Set([
   "upgrade"
 ]);
 
-async function proxy(req: NextRequest, ctx: { params: Promise<{ path?: string[] }> }) {
-  const { path } = await ctx.params;
-  const pathSeg = path?.length ? path.join("/") : "";
-  const target = `${BACKEND}/api/${pathSeg ? `${pathSeg}/` : ""}${req.nextUrl.search}`;
+/** Build Render URL from the incoming path (params can be empty on some hosts; pathname is reliable). */
+function upstreamTarget(req: NextRequest): string {
+  let rest = req.nextUrl.pathname;
+  if (rest.startsWith("/api")) {
+    rest = rest.slice(4) || "/";
+  }
+  if (!rest.startsWith("/")) rest = `/${rest}`;
+  if (rest !== "/" && !rest.endsWith("/")) rest = `${rest}/`;
+  return `${BACKEND}/api${rest}${req.nextUrl.search}`;
+}
+
+async function proxy(req: NextRequest, _ctx: { params: Promise<{ path?: string[] }> }) {
+  const target = upstreamTarget(req);
 
   const headers = new Headers();
   req.headers.forEach((value, key) => {
