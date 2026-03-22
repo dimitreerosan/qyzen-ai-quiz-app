@@ -1,8 +1,7 @@
 "use client";
 
-export const dynamic = "force-dynamic";
-
 import * as React from "react";
+import { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/Button";
 import { getQuiz, submitQuiz, type QuizDetail } from "@/lib/api";
@@ -17,7 +16,7 @@ function getCorrectOptionId(question: QuizDetail["questions"][number]): number |
   return opt?.id ?? null;
 }
 
-export default function QuizPage() {
+function QuizPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { ready } = useRequireAuth();
@@ -269,6 +268,14 @@ export default function QuizPage() {
         </aside>
       </div>
     </div>
+  );
+}
+
+export default function QuizPage() {
+  return (
+    <Suspense fallback={<div className="text-sm text-black/60">Loading quiz…</div>}>
+      <QuizPageContent />
+    </Suspense>
   );
 }
 
