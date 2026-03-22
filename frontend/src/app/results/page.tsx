@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { getAttemptDetail, getQuiz, getQuizHistory, type QuizDetail } from "@/lib/api";
 import { getToken } from "@/lib/auth";
@@ -12,7 +13,7 @@ function getCorrectOptionId(question: QuizDetail["questions"][number]): number |
   return opt?.id ?? null;
 }
 
-export default function ResultsPage() {
+function ResultsPageContent() {
   const params = useSearchParams();
   const { ready } = useRequireAuth();
 
@@ -203,6 +204,14 @@ export default function ResultsPage() {
         </div>
       </section>
     </div>
+  );
+}
+
+export default function ResultsPage() {
+  return (
+    <Suspense fallback={<div className="text-sm text-black/60">Loading results…</div>}>
+      <ResultsPageContent />
+    </Suspense>
   );
 }
 
