@@ -80,7 +80,7 @@ export default function MyQuizzesPage() {
         description: "Master the basics of React, including components, state, props, and simple hooks…",
         topic: "React fundamentals",
         minutes: 15,
-        questions: 20,
+        questions: 19,
         difficulty: "easy",
         imageUrl: "https://images.unsplash.com/photo-1618477247222-acbdb0e159b3?auto=format&fit=crop&w=1200&q=80"
       },
@@ -104,7 +104,7 @@ export default function MyQuizzesPage() {
         description: "Test your knowledge on scalable architectures, microservices, load balancing…",
         topic: "System design basics",
         minutes: 45,
-        questions: 30,
+        questions: 19,
         difficulty: "hard",
         imageUrl: "https://images.unsplash.com/photo-1484417894907-623942c8ee29?auto=format&fit=crop&w=1200&q=80"
       },
@@ -128,7 +128,7 @@ export default function MyQuizzesPage() {
         description: "Test your knowledge of core AWS services: EC2, S2, RDS, Lambda, and IAM basics…",
         topic: "AWS cloud foundations",
         minutes: 30,
-        questions: 20,
+        questions: 19,
         difficulty: "easy",
         imageUrl: "https://images.unsplash.com/photo-1639322537228-f710d846310a?auto=format&fit=crop&w=1200&q=80"
       },
@@ -140,7 +140,7 @@ export default function MyQuizzesPage() {
         description: "Building scalable backend services using Node.js, message queues, and clustering…",
         topic: "Node.js microservices architecture",
         minutes: 35,
-        questions: 20,
+        questions: 19,
         difficulty: "medium",
         imageUrl: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1200&q=80"
       },
@@ -164,7 +164,7 @@ export default function MyQuizzesPage() {
         description: "Evaluate your understanding of Python's built-in data structures, algorithmic…",
         topic: "Python data structures",
         minutes: 30,
-        questions: 25,
+        questions: 19,
         difficulty: "medium",
         imageUrl: "https://images.unsplash.com/photo-1516116216624-53e697fedbea?auto=format&fit=crop&w=1200&q=80"
       },
@@ -188,7 +188,7 @@ export default function MyQuizzesPage() {
         description: "Dive deep into advanced querying, indexing strategies, performance tuning, and…",
         topic: "PostgreSQL basics",
         minutes: 40,
-        questions: 25,
+        questions: 19,
         difficulty: "hard",
         imageUrl: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=1200&q=80"
       },
@@ -250,9 +250,11 @@ export default function MyQuizzesPage() {
         return;
       }
 
+      const safeQuestionCount = Math.min(19, Math.max(5, card.questions));
+
       const quiz: QuizDetail = await generateQuiz(token, {
         topic: card.topic,
-        number_of_questions: card.questions,
+        number_of_questions: safeQuestionCount,
         difficulty: card.difficulty
       });
 
@@ -274,8 +276,8 @@ export default function MyQuizzesPage() {
       setCustomError("Please enter a topic.");
       return;
     }
-    if (!Number.isFinite(customQuestionCount) || customQuestionCount < 5 || customQuestionCount > 20) {
-      setCustomError("Question count must be between 5 and 20.");
+    if (!Number.isFinite(customQuestionCount) || customQuestionCount < 5 || customQuestionCount > 19) {
+      setCustomError("Question count must be between 5 and 19.");
       return;
     }
 
@@ -340,11 +342,11 @@ export default function MyQuizzesPage() {
           </label>
 
           <label className="block">
-            <span className="mb-1 block text-xs font-medium text-slate-500">Questions (5-20)</span>
+            <span className="mb-1 block text-xs font-medium text-slate-500">Questions (5-19)</span>
             <input
               type="number"
               min={5}
-              max={20}
+              max={19}
               value={customQuestionCount}
               onChange={(e) => setCustomQuestionCount(Number(e.target.value))}
               className="h-10 w-full rounded-md border border-slate-200 px-3 text-sm text-slate-800 outline-none focus:border-brand-300 focus:ring-2 focus:ring-brand-200/50"

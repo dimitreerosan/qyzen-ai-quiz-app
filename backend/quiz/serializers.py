@@ -55,7 +55,7 @@ class QuizDetailSerializer(serializers.ModelSerializer):
 
 class QuizGenerateSerializer(serializers.Serializer):
     topic = serializers.CharField(max_length=255)
-    number_of_questions = serializers.IntegerField(min_value=5, max_value=20)
+    number_of_questions = serializers.IntegerField(min_value=5, max_value=19)
     difficulty = serializers.ChoiceField(choices=["easy", "medium", "hard"])
 
 
