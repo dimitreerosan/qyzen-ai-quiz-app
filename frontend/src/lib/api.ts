@@ -1,4 +1,17 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api";
+/**
+ * On Vercel, browser `fetch` to Render often fails (CORS / opaque network errors). Builds set
+ * NEXT_PUBLIC_API_PROXY; we call same-origin `/api/...` and next.config.js rewrites to Render.
+ */
+function getApiBaseUrl(): string {
+  if (process.env.NEXT_PUBLIC_API_PROXY === "1") {
+    return "/api";
+  }
+  const explicit = process.env.NEXT_PUBLIC_API_URL?.trim();
+  if (explicit) return explicit.replace(/\/$/, "");
+  return "http://127.0.0.1:8000/api";
+}
+
+const API_BASE_URL = getApiBaseUrl();
 
 export type ApiError = {
   status: number;
@@ -58,9 +71,13 @@ async function rawRequest<T>(path: string, options: RequestInit & { token?: stri
       }
     });
   } catch (e) {
+    const hint =
+      process.env.NEXT_PUBLIC_API_PROXY === "1"
+        ? " Check BACKEND_ORIGIN / Render logs if this persists."
+        : " If the API is remote, CORS may block the browser—deploy the frontend on Vercel with the default proxy (NEXT_PUBLIC_API_PROXY).";
     const err: ApiError = {
       status: 0,
-      message: `Cannot reach API at ${API_BASE_URL}. Make sure the backend is running and accessible.`,
+      message: `Cannot reach API at ${API_BASE_URL}. Make sure the backend is running and accessible.${hint}`,
       details: e
     };
     throw err;
