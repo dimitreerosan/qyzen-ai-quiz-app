@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+
 import * as React from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/Button";
@@ -17,11 +19,11 @@ function getCorrectOptionId(question: QuizDetail["questions"][number]): number |
 
 export default function QuizPage() {
   const router = useRouter();
-  const params = useSearchParams();
+  const searchParams = useSearchParams();
   const { ready } = useRequireAuth();
 
-  const quizId = Number(params.get("quizId") ?? "");
-  const timeParam = Number(params.get("time") ?? "0");
+  const [quizId, setQuizId] = React.useState<number | null>(null);
+  const [timeParam, setTimeParam] = React.useState<number>(0);
 
   const [quiz, setQuiz] = React.useState<QuizDetail | null>(null);
   const [loading, setLoading] = React.useState(false);
@@ -33,6 +35,11 @@ export default function QuizPage() {
   const [timeLeft, setTimeLeft] = React.useState<number>(0);
   const [isTimedOut, setIsTimedOut] = React.useState(false);
   const onSubmitRef = React.useRef<() => void>(() => { });
+
+  React.useEffect(() => {
+    setQuizId(Number(searchParams.get("quizId") ?? ""));
+    setTimeParam(Number(searchParams.get("time") ?? "0"));
+  }, [searchParams]);
 
 
 
