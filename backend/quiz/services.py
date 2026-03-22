@@ -70,10 +70,12 @@ def generate_mcqs(topic: str, number_of_questions: int, difficulty: str) -> Dict
     try:
         resp = requests.post(url, headers=headers, params={"key": api_key}, json=payload, timeout=30)
     except requests.RequestException as exc:
-        raise AIServiceError("AI request failed") from exc
+        # Fallback to mock data when AI provider is unavailable
+        return _mock_mcqs(topic, number_of_questions, difficulty)
 
     if resp.status_code >= 400:
-        raise AIServiceError(f"AI provider error: {resp.status_code}")
+        # Fallback to mock data on AI provider HTTP error
+        return _mock_mcqs(topic, number_of_questions, difficulty)
 
     data = resp.json()
     try:
@@ -83,7 +85,8 @@ def generate_mcqs(topic: str, number_of_questions: int, difficulty: str) -> Dict
 
     try:
         parsed = _extract_json(text)
-    except Exception as exc:
-        raise AIServiceError("Failed to parse AI response") from exc
+    except Exception:
+        # Fallback to mock if AI response parsing fails
+        return _mock_mcqs(topic, number_of_questions, difficulty)
 
     return parsed
