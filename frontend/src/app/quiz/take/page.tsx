@@ -44,7 +44,7 @@ export default function QuizPage() {
 
 
   React.useEffect(() => {
-    if (!ready) return;
+    if (!ready || quizId === null) return;
     if (!Number.isFinite(quizId) || quizId <= 0) {
       setError("Missing quizId. Generate a quiz from the My Quizzes page.");
       return;
