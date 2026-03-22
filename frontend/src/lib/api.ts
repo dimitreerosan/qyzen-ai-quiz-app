@@ -38,16 +38,26 @@ function looksLikeHtmlServerPage(text: string): boolean {
 
 function messageFromFailedResponse(status: number, payload: unknown): string {
   if (payload && typeof payload === "object") {
+    // 1. SimpleJWT or DRF "detail" field
     if ("detail" in payload && String((payload as any).detail)) {
       return String((payload as any).detail);
     }
-    const firstKey = Object.keys(payload)[0];
-    const firstVal = (payload as any)[firstKey];
-    if (Array.isArray(firstVal) && firstVal.length > 0) {
-      return `${firstKey}: ${firstVal[0]}`;
+    // 2. DRF non_field_errors
+    if ("non_field_errors" in payload) {
+      const nfe = (payload as any).non_field_errors;
+      if (Array.isArray(nfe) && nfe.length > 0) return String(nfe[0]);
     }
-    if (typeof firstVal === "string") {
-      return `${firstKey}: ${firstVal}`;
+    // 3. Specific field errors (e.g. "username": ["..."])
+    const keys = Object.keys(payload);
+    if (keys.length > 0) {
+      const firstKey = keys[0];
+      const firstVal = (payload as any)[firstKey];
+      if (Array.isArray(firstVal) && firstVal.length > 0) {
+        return `${firstKey}: ${firstVal[0]}`;
+      }
+      if (typeof firstVal === "string") {
+        return `${firstKey}: ${firstVal}`;
+      }
     }
   }
   if (typeof payload === "string" && payload) {
@@ -64,6 +74,7 @@ function messageFromFailedResponse(status: number, payload: unknown): string {
 
 async function rawRequest<T>(path: string, options: RequestInit & { token?: string | null } = {}): Promise<T> {
   const { token, headers, ...rest } = options;
+  const method = options.method || "GET";
   let res: Response;
   try {
     res = await fetch(`${API_BASE_URL}${path}`, {
@@ -94,6 +105,13 @@ async function rawRequest<T>(path: string, options: RequestInit & { token?: stri
 
   if (!res.ok) {
     const message = messageFromFailedResponse(res.status, payload);
+    // Explicit console logging to help troubleshooting (Step 4 from user guide)
+    console.warn(`[API Error] ${method} ${path} returned ${res.status}:`, {
+      message,
+      payload,
+      status: res.status,
+      target: `${API_BASE_URL}${path}`
+    });
     const err: ApiError = { status: res.status, message, details: payload };
     throw err;
   }
