@@ -9,13 +9,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env")
 
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "change-me")
-DEBUG = os.getenv("DJANGO_DEBUG", "false").lower() == "true"
+DEBUG = False
 
-_allowed_hosts = os.getenv("DJANGO_ALLOWED_HOSTS", "").strip()
-if _allowed_hosts:
-    ALLOWED_HOSTS = [h.strip() for h in _allowed_hosts.split(",") if h.strip()]
-else:
-    ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+ALLOWED_HOSTS = [
+    "qyzen-ai-quiz-app.onrender.com",
+    "localhost",
+    "127.0.0.1"
+]
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 INSTALLED_APPS = [
     "django.contrib.admin",
