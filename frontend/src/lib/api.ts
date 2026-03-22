@@ -103,19 +103,19 @@ export type User = { id: number; username: string; email: string };
 
 // ---------- API ----------
 export async function login(input: { username: string; password: string }): Promise<LoginResponse> {
-  return rawRequest<LoginResponse>("/auth/login", { method: "POST", body: JSON.stringify(input) });
+  return rawRequest<LoginResponse>("/auth/login/", { method: "POST", body: JSON.stringify(input) });
 }
 
 export async function register(input: { username: string; password: string; email?: string }): Promise<RegisterResponse> {
-  return rawRequest<RegisterResponse>("/auth/register", { method: "POST", body: JSON.stringify({ ...input, email: input.email ?? "" }) });
+  return rawRequest<RegisterResponse>("/auth/register/", { method: "POST", body: JSON.stringify({ ...input, email: input.email ?? "" }) });
 }
 
 export async function getCurrentUser(token: string): Promise<User> {
-  return request<User>("/auth/me", { method: "GET", token });
+  return request<User>("/auth/me/", { method: "GET", token });
 }
 
 export async function refreshAccessToken(refresh: string): Promise<RefreshResponse> {
-  return rawRequest<RefreshResponse>("/auth/refresh", { method: "POST", body: JSON.stringify({ refresh }) });
+  return rawRequest<RefreshResponse>("/auth/refresh/", { method: "POST", body: JSON.stringify({ refresh }) });
 }
 
 async function request<T>(path: string, options: RequestInit & { token?: string | null } = {}): Promise<T> {
@@ -149,25 +149,25 @@ export async function generateQuiz(
   token: string,
   input: { topic: string; number_of_questions: number; difficulty: "easy" | "medium" | "hard" }
 ): Promise<QuizDetail> {
-  return request<QuizDetail>("/quiz/generate", { method: "POST", token, body: JSON.stringify(input) });
+  return request<QuizDetail>("/quiz/generate/", { method: "POST", token, body: JSON.stringify(input) });
 }
 
 export async function getQuiz(token: string, id: number): Promise<QuizDetail> {
-  return request<QuizDetail>(`/quiz/${id}`, { method: "GET", token });
+  return request<QuizDetail>(`/quiz/${id}/`, { method: "GET", token });
 }
 
 export async function submitQuiz(
   token: string,
   input: { quiz_id: number; answers: Array<{ question_id: number; selected_option_id: number }> }
 ): Promise<SubmitQuizResponse> {
-  return request<SubmitQuizResponse>("/quiz/submit", { method: "POST", token, body: JSON.stringify(input) });
+  return request<SubmitQuizResponse>("/quiz/submit/", { method: "POST", token, body: JSON.stringify(input) });
 }
 
 export async function getQuizHistory(token: string): Promise<Attempt[]> {
-  return request<Attempt[]>("/quiz/history", { method: "GET", token });
+  return request<Attempt[]>("/quiz/history/", { method: "GET", token });
 }
 
 export async function getAttemptDetail(token: string, id: number): Promise<AttemptDetail> {
-  return request<AttemptDetail>(`/quiz/attempt/${id}`, { method: "GET", token });
+  return request<AttemptDetail>(`/quiz/attempt/${id}/`, { method: "GET", token });
 }
 
