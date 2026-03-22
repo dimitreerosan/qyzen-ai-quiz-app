@@ -76,7 +76,7 @@ function QuizPageContent() {
       })
       .catch((e: any) => setError(e?.message ?? "Failed to load quiz"))
       .finally(() => setLoading(false));
-  }, [ready, quizId]);
+  }, [ready, quizId, timeParam]);
 
   React.useEffect(() => {
     if (!quiz || submitLoading || isTimedOut) return;
@@ -93,36 +93,7 @@ function QuizPageContent() {
     return () => window.clearInterval(timerId);
   }, [quiz, timeLeft, submitLoading, isTimedOut]);
 
-  React.useEffect(() => {
-    onSubmitRef.current = onSubmit;
-  }, [onSubmit]);
-
-  if (!ready) return null;
-  if (loading) return <div className="text-sm text-black/60">Loading quiz…</div>;
-  if (error) return <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</div>;
-  if (!quiz) return <div className="text-sm text-black/60">No quiz loaded.</div>;
-
-  const q = quiz.questions[index];
-  const total = quiz.questions.length;
-
-  const selected = answers[q.id] ?? null;
-  const answeredCount = Object.values(answers).filter((v) => v != null).length;
-
-  function formatTime(seconds: number) {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
-  }
-
-  const timerStatusClass = timeLeft > 60 ? "text-ink-900" : "text-rose-500";
-
-  function onExitQuiz() {
-    const ok = window.confirm("Exit quiz? Your current progress will be lost.");
-    if (!ok) return;
-    router.push("/quiz");
-  }
-
-  async function onSubmit() {
+  const onSubmit = React.useCallback(async () => {
     if (!quiz) return;
     setError(null);
     setSubmitLoading(true);
@@ -154,7 +125,37 @@ function QuizPageContent() {
     } finally {
       setSubmitLoading(false);
     }
+  }, [quiz, answers, router]);
+
+  React.useEffect(() => {
+    onSubmitRef.current = onSubmit;
+  }, [onSubmit]);
+
+  if (!ready) return null;
+  if (loading) return <div className="text-sm text-black/60">Loading quiz…</div>;
+  if (error) return <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</div>;
+  if (!quiz) return <div className="text-sm text-black/60">No quiz loaded.</div>;
+
+  const q = quiz.questions[index];
+  const total = quiz.questions.length;
+
+  const selected = answers[q.id] ?? null;
+  const answeredCount = Object.values(answers).filter((v) => v != null).length;
+
+  function formatTime(seconds: number) {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
   }
+
+  const timerStatusClass = timeLeft > 60 ? "text-ink-900" : "text-rose-500";
+
+  function onExitQuiz() {
+    const ok = window.confirm("Exit quiz? Your current progress will be lost.");
+    if (!ok) return;
+    router.push("/quiz");
+  }
+
 
   return (
     <div className="mx-auto w-full max-w-5xl">

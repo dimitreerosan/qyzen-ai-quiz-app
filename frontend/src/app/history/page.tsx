@@ -101,7 +101,7 @@ export default function HistoryPage() {
       .finally(() => setLoading(false));
   }, [ready]);
 
-  const attempts = history ?? [];
+  const attempts = React.useMemo(() => history ?? [], [history]);
   const totalQuizzes = attempts.length;
   const totalTimeSpentMinutes = attempts.reduce((sum, a) => sum + (a.quiz.time_limit_minutes ?? 0), 0);
 

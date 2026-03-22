@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { Button } from "@/components/Button";
 import { generateQuiz, type QuizDetail } from "@/lib/api";
 import { getToken } from "@/lib/auth";
@@ -400,12 +401,12 @@ export default function MyQuizzesPage() {
         {filteredCards.map((card) => (
           <div key={card.id} className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
             <div className="relative h-40 overflow-hidden">
-              <img
+              <Image
                 src={card.imageUrl}
                 alt={card.title}
-                className="h-full w-full object-cover"
+                fill
+                className="object-cover"
                 loading="lazy"
-                referrerPolicy="no-referrer"
               />
               <div className="absolute right-3 top-3 rounded-full bg-white/85 px-3 py-1 text-[10px] font-semibold text-slate-600 shadow-sm">
                 Featured
