@@ -3,11 +3,18 @@
  * NEXT_PUBLIC_API_PROXY; we call same-origin `/api/...` and next.config.js rewrites to Render.
  */
 function getApiBaseUrl(): string {
+  // Allow explicit direct URL (including Step 3 VITE_ prefix as requested) to override proxy
+  const explicit = (
+    process.env.NEXT_PUBLIC_API_URL || 
+    process.env.VITE_API_URL || 
+    (process.env as any).VITE_API_URL
+  )?.trim();
+
+  if (explicit) return explicit.replace(/\/$/, "");
+
   if (process.env.NEXT_PUBLIC_API_PROXY === "1") {
     return "/api";
   }
-  const explicit = process.env.NEXT_PUBLIC_API_URL?.trim();
-  if (explicit) return explicit.replace(/\/$/, "");
   return "http://127.0.0.1:8000/api";
 }
 
