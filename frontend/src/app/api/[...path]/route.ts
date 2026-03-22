@@ -3,8 +3,15 @@ import { NextRequest, NextResponse } from "next/server";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const BACKEND =
-  process.env.BACKEND_ORIGIN?.replace(/\/$/, "") || "https://qyzen-ai-quiz-app.onrender.com";
+/** Site origin only (no /api). Vercel often has BACKEND_ORIGIN set to "...onrender.com/api" — that would double /api and yield 404. */
+function backendOrigin(): string {
+  let o = (process.env.BACKEND_ORIGIN || "https://qyzen-ai-quiz-app.onrender.com").trim();
+  o = o.replace(/\/+$/, "");
+  if (o.endsWith("/api")) {
+    o = o.slice(0, -4).replace(/\/+$/, "");
+  }
+  return o;
+}
 
 const HOP_BY_HOP = new Set([
   "connection",
@@ -25,7 +32,8 @@ function upstreamTarget(req: NextRequest): string {
   }
   if (!rest.startsWith("/")) rest = `/${rest}`;
   if (rest !== "/" && !rest.endsWith("/")) rest = `${rest}/`;
-  return `${BACKEND}/api${rest}${req.nextUrl.search}`;
+  const origin = backendOrigin();
+  return `${origin}/api${rest}${req.nextUrl.search}`;
 }
 
 async function proxy(req: NextRequest, _ctx: { params: Promise<{ path?: string[] }> }) {
