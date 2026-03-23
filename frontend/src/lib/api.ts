@@ -3,27 +3,28 @@
  * NEXT_PUBLIC_API_PROXY; we call same-origin `/api/...` and next.config.js rewrites to Render.
  */
 function getApiBaseUrl(): string {
-  // STEP 1 — Hardcoded Test (as requested to bypass env issues)
-  const FORCED_API_URL = "https://qyzen-ai-quiz-app.onrender.com/api";
-  
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || process.env.VITE_API_URL;
+
   if (typeof window !== "undefined" && (window as any).DEBUG_API) {
     console.log("[API Configuration Debug]", {
-      FORCED_API_URL,
       NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
       VITE_API_URL: process.env.VITE_API_URL,
       NEXT_PUBLIC_API_PROXY: process.env.NEXT_PUBLIC_API_PROXY,
-      VERCEL: process.env.VERCEL
+      VERCEL: process.env.VERCEL,
+      Resolved: apiUrl,
     });
   }
 
-  // Use the forced URL if we're on Vercel or if explicitly told to
-  if (process.env.VERCEL || process.env.NEXT_PUBLIC_API_PROXY === "1") {
-    return FORCED_API_URL;
+  if (process.env.NEXT_PUBLIC_API_PROXY === "1") {
+    // When using the proxy, the base path is relative to the current domain.
+    return "/api";
   }
 
-  const explicit = (process.env.NEXT_PUBLIC_API_URL || process.env.VITE_API_URL)?.trim();
-  if (explicit) return explicit.replace(/\/$/, "");
+  if (apiUrl) {
+    return apiUrl.trim().replace(/\/$/, "");
+  }
 
+  // Fallback for local development
   return "http://127.0.0.1:8000/api";
 }
 
