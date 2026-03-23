@@ -154,7 +154,7 @@ export default function HistoryPage() {
 
       const originalQuiz = await getQuiz(token, attempt.quiz.id);
       const originalCount = originalQuiz.questions.length;
-      const numberOfQuestions = Math.min(20, Math.max(5, originalCount || 10));
+      const numberOfQuestions = Math.min(50, Math.max(5, originalCount || 10));
 
       const newQuiz = await generateQuiz(token, {
         topic: attempt.quiz.topic,

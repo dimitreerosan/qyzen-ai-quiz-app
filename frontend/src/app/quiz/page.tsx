@@ -250,7 +250,7 @@ export default function MyQuizzesPage() {
         return;
       }
 
-      const safeQuestionCount = Math.min(19, Math.max(5, card.questions));
+      const safeQuestionCount = Math.min(50, Math.max(5, card.questions));
 
       const quiz: QuizDetail = await generateQuiz(token, {
         topic: card.topic,
@@ -276,8 +276,8 @@ export default function MyQuizzesPage() {
       setCustomError("Please enter a topic.");
       return;
     }
-    if (!Number.isFinite(customQuestionCount) || customQuestionCount < 5 || customQuestionCount > 19) {
-      setCustomError("Question count must be between 5 and 19.");
+    if (!Number.isFinite(customQuestionCount) || customQuestionCount < 5 || customQuestionCount > 50) {
+      setCustomError("Question count must be between 5 and 50.");
       return;
     }
 
@@ -342,11 +342,11 @@ export default function MyQuizzesPage() {
           </label>
 
           <label className="block">
-            <span className="mb-1 block text-xs font-medium text-slate-500">Questions (5-19)</span>
+            <span className="mb-1 block text-xs font-medium text-slate-500">Questions (5-50)</span>
             <input
               type="number"
               min={5}
-              max={19}
+              max={50}
               value={customQuestionCount}
               onChange={(e) => setCustomQuestionCount(Number(e.target.value))}
               className="h-10 w-full rounded-md border border-slate-200 px-3 text-sm text-slate-800 outline-none focus:border-brand-300 focus:ring-2 focus:ring-brand-200/50"

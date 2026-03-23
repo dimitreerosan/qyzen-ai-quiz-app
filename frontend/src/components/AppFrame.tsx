@@ -23,11 +23,11 @@ export function AppFrame({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-dvh bg-[#f5f7fb]">
-      <div className="mx-auto flex min-h-dvh w-full max-w-[1400px]">
-        <div className="w-[250px] shrink-0 border-r border-slate-200 bg-[#f3f5f9] px-4 py-4">
+      <div className="mx-auto min-h-dvh w-full max-w-[1400px] lg:flex">
+        <div className="hidden w-[250px] shrink-0 border-r border-slate-200 bg-[#f3f5f9] px-4 py-4 lg:block">
           <Sidebar />
         </div>
-        <div className="min-w-0 flex-1 px-7 py-6">
+        <div className="min-w-0 flex-1 px-4 py-4 sm:px-6 sm:py-5 lg:px-7 lg:py-6">
           <Topbar />
           <div className="mt-6">{children}</div>
         </div>
